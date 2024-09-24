@@ -1,3 +1,5 @@
+encryption.py:
+
 from cryptography.fernet import Fernet
 
 # Generate a key for encryption and decryption
@@ -34,3 +36,134 @@ def decrypt_file(file_path):
 
     with open(file_path, "wb") as decrypted_file:
         decrypted_file.write(decrypted)
+
+user_auth.py:
+from flask import session
+import hashlib
+import os
+
+# Dummy database for user credentials
+users_db = {}
+
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def register_user(username, password):
+    if username in users_db:
+        return False
+    users_db[username] = hash_password(password)
+    return True
+
+def authenticate_user(username, password):
+    if username in users_db and users_db[username] == hash_password(password):
+        session['username'] = username
+        return True
+    return False
+
+def is_authenticated():
+    return 'username' in session
+app.py:
+from flask import Flask, request, redirect, url_for, render_template, session
+import os
+from encryption import encrypt_file, decrypt_file
+from user_auth import register_user, authenticate_user, is_authenticated
+
+app = Flask(__name__)
+app.secret_key = os.urandom(24)
+
+# Ensure the uploads directory exists
+os.makedirs("uploads", exist_ok=True)
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        if authenticate_user(username, password):
+            return redirect(url_for('upload'))
+        else:
+            return "Invalid credentials."
+    return render_template('login.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        if register_user(username, password):
+            return redirect(url_for('login'))
+        else:
+            return "User already exists."
+    return render_template('login.html')
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload():
+    if not is_authenticated():
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        file = request.files['file']
+        if file:
+            file_path = os.path.join('uploads', file.filename)
+            file.save(file_path)
+            encrypt_file(file_path)  # Encrypt the file after saving
+            return "File uploaded and encrypted successfully."
+    return render_template('upload.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    return redirect(url_for('index'))
+
+if __name__ == '__main__':
+    # Generate a key if it doesn't exist
+    if not os.path.exists("secret.key"):
+        with open("secret.key", "wb") as key_file:
+            key_file.write(generate_key())
+    app.run(debug=True)
+templates/index.html:
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Secure File Storage</title>
+</head>
+<body>
+    <h1>Welcome to Secure File Storage</h1>
+    <a href="/login">Login</a> | <a href="/register">Register</a>
+</body>
+</html>
+templates/login.html:
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+    <h1>Login</h1>
+    <form method="post">
+        Username: <input type="text" name="username" required><br>
+        Password: <input type="password" name="password" required><br>
+        <input type="submit" value="Login">
+    </form>
+    <a href="/register">Register</a>
+</body>
+</html>
+templates/upload.html:
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload File</title>
+</head>
+<body>
+    <h1>Upload File</h1>
+    <form method="post" enctype="multipart/form-data">
+        Select file: <input type="file" name="file" required><br>
+        <input type="submit" value="Upload">
+    </form>
+    <a href="/logout">Logout</a>
+</body>
+</html>
