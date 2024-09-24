@@ -1,0 +1,39 @@
+import requests
+
+class WebAppScanner:
+    def __init__(self, base_url):
+        self.base_url = base_url
+
+    def check_sql_injection(self):
+        payload = "' OR '1'='1"
+        response = requests.get(self.base_url + payload)
+        
+        if "error" not in response.text.lower() and "sql" in response.text.lower():
+            return "Potential SQL Injection vulnerability found."
+        return "No SQL Injection vulnerability found."
+
+    def check_xss(self):
+        payload = "<script>alert('XSS')</script>"
+        response = requests.get(self.base_url + "?search=" + payload)
+        
+        if payload in response.text:
+            return "Potential XSS vulnerability found."
+        return "No XSS vulnerability found."
+
+    def check_csrf(self):
+        # CSRF checks usually involve checking for anti-CSRF tokens in forms
+        response = requests.get(self.base_url)
+        if 'csrf_token' in response.text:  # Assuming 'csrf_token' is used as an anti-CSRF token
+            return "No CSRF vulnerability found (token detected)."
+        return "Potential CSRF vulnerability found (token not detected)."
+
+    def run_scanner(self):
+        print(f"Scanning {self.base_url} for vulnerabilities...")
+        print(self.check_sql_injection())
+        print(self.check_xss())
+        print(self.check_csrf())
+
+if __name__ == "__main__":
+    target_url = input("Enter the URL to scan (e.g., http://example.com): ")
+    scanner = WebAppScanner(target_url)
+    scanner.run_scanner()
