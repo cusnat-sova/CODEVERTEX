@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishing Awareness</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Phishing Awareness</h1>
+        <nav>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#common-tactics">Common Tactics</a></li>
+                <li><a href="#recognize">How to Recognize</a></li>
+                <li><a href="#avoid">How to Avoid</a></li>
+                <li><a href="#report">Report Phishing</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home">
+            <h2>Welcome to Phishing Awareness</h2>
+            <p>Phishing is a fraudulent attempt to obtain sensitive information by disguising as a trustworthy entity. This website provides information on how to recognize and avoid phishing attacks.</p>
+        </section>
+
+        <section id="common-tactics">
+            <h2>Common Phishing Tactics</h2>
+            <ul>
+                <li>Email Phishing: Fake emails that look real.</li>
+                <li>Spear Phishing: Targeted attacks on specific individuals.</li>
+                <li>Whaling: Attacks on high-profile individuals like executives.</li>
+                <li>Vishing: Phishing through voice calls.</li>
+                <li>Smishing: Phishing via SMS messages.</li>
+            </ul>
+        </section>
+
+        <section id="recognize">
+            <h2>How to Recognize Phishing</h2>
+            <p>Look for the following signs:</p>
+            <ul>
+                <li>Unusual sender email addresses</li>
+                <li>Generic greetings (e.g., "Dear User")</li>
+                <li>Urgency or threats in the message</li>
+                <li>Links that don’t match the expected URL</li>
+            </ul>
+        </section>
+
+        <section id="avoid">
+            <h2>How to Avoid Phishing</h2>
+            <p>Follow these best practices:</p>
+            <ul>
+                <li>Always verify the sender's identity.</li>
+                <li>Do not click on suspicious links.</li>
+                <li>Use two-factor authentication when available.</li>
+                <li>Keep your software and antivirus updated.</li>
+            </ul>
+        </section>
+
+        <section id="report">
+            <h2>Reporting Phishing</h2>
+            <p>If you encounter a phishing attempt, report it to your email provider or local authorities. You can also check with official organizations like the FTC.</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>Contact us for more information: info@phishingawareness.com</p>
+    </footer>
+</body>
+</html>
+CSS FILE:
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+}
+
+header {
+    background-color: #4CAF50;
+    color: white;
+    padding: 1em 0;
+    text-align: center;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+main {
+    padding: 20px;
+}
+
+section {
+    margin: 20px 0;
+    background: white;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #4CAF50;
+    color: white;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
