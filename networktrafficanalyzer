@@ -1,0 +1,26 @@
+from scapy.all import sniff, IP, TCP, UDP, ARP
+
+def packet_callback(packet):
+    if IP in packet:
+        ip_layer = packet[IP]
+        print(f"IP Packet: {ip_layer.src} -> {ip_layer.dst}")
+        
+    elif TCP in packet:
+        tcp_layer = packet[TCP]
+        print(f"TCP Packet: {tcp_layer.sport} -> {tcp_layer.dport}")
+
+    elif UDP in packet:
+        udp_layer = packet[UDP]
+        print(f"UDP Packet: {udp_layer.sport} -> {udp_layer.dport}")
+
+    elif ARP in packet:
+        arp_layer = packet[ARP]
+        print(f"ARP Packet: {arp_layer.psrc} -> {arp_layer.pdst}")
+
+def start_sniffing(interface=None):
+    print("Starting packet capture...")
+    sniff(iface=interface, prn=packet_callback, store=0)
+
+if __name__ == "__main__":
+    # You can specify the network interface (like 'eth0' or 'wlan0')
+    start_sniffing(interface=None)  # Use None to sniff on all interfaces
