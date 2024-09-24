@@ -1,0 +1,16 @@
+import os
+import time
+
+# Simulated ransomware script
+def simulate_ransomware(target_directory):
+    print("Simulating ransomware attack...")
+    time.sleep(5)  # Simulate delay before encryption
+    for root, dirs, files in os.walk(target_directory):
+        for file in files:
+            if file.endswith(".txt"):  # Target text files
+                # Simulating encryption (renaming)
+                os.rename(os.path.join(root, file), os.path.join(root, f"{file}.encrypted"))
+                print(f"Encrypted {file}")
+
+# Specify your target directory
+simulate_ransomware("C:/path/to/test/directory")
