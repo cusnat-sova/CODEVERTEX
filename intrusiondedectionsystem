@@ -1,0 +1,68 @@
+feature_extraction.py:
+from scapy.all import IP, TCP, UDP
+import pandas as pd
+
+def extract_features(packet):
+    if IP in packet:
+        features = {
+            'src_ip': packet[IP].src,
+            'dst_ip': packet[IP].dst,
+            'protocol': packet[IP].proto,
+            'length': len(packet)
+        }
+        return features
+    return None
+
+def create_dataframe(packet_list):
+    features_list = []
+    for packet in packet_list:
+        features = extract_features(packet)
+        if features:
+            features_list.append(features)
+    
+    return pd.DataFrame(features_list)
+train_model.py:
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+import joblib
+
+# Load your labeled dataset
+# The dataset should have features and a label column ('label' for benign/malicious)
+data = pd.read_csv('traffic_data.csv')  # Example CSV file with features and labels
+
+X = data.drop('label', axis=1)
+y = data['label']
+
+# Split the data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train a model
+model = RandomForestClassifier()
+model.fit(X_train, y_train)
+
+# Save the model
+joblib.dump(model, 'ids_model.pkl')
+ids.py:
+import joblib
+from scapy.all import sniff
+from feature_extraction import extract_features
+import pandas as pd
+
+# Load the trained model
+model = joblib.load('ids_model.pkl')
+
+def detect_suspicious_activity(packet):
+    features = extract_features(packet)
+    if features:
+        df = pd.DataFrame([features])
+        prediction = model.predict(df)
+        if prediction[0] == 1:  # Assuming 1 represents malicious
+            print(f"Suspicious activity detected from {features['src_ip']} to {features['dst_ip']}")
+
+def start_monitoring(interface=None):
+    print("Starting IDS...")
+    sniff(iface=interface, prn=detect_suspicious_activity, store=0)
+
+if __name__ == "__main__":
+    start_monitoring()  # You can specify the interface as needed
