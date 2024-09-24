@@ -1,0 +1,77 @@
+def caesar_cipher_encrypt(text, shift):
+    encrypted = ""
+    for char in text:
+        if char.isalpha():
+            shift_base = ord('A') if char.isupper() else ord('a')
+            encrypted += chr((ord(char) - shift_base + shift) % 26 + shift_base)
+        else:
+            encrypted += char
+    return encrypted
+
+def caesar_cipher_decrypt(text, shift):
+    return caesar_cipher_encrypt(text, -shift)
+
+def vigenere_encrypt(plaintext, keyword):
+    keyword_repeated = (keyword * (len(plaintext) // len(keyword) + 1))[:len(plaintext)]
+    encrypted = ""
+    
+    for p_char, k_char in zip(plaintext, keyword_repeated):
+        if p_char.isalpha():
+            shift = ord(k_char.lower()) - ord('a')
+            encrypted += caesar_cipher_encrypt(p_char, shift)
+        else:
+            encrypted += p_char
+    return encrypted
+
+def vigenere_decrypt(ciphertext, keyword):
+    keyword_repeated = (keyword * (len(ciphertext) // len(keyword) + 1))[:len(ciphertext)]
+    decrypted = ""
+    
+    for c_char, k_char in zip(ciphertext, keyword_repeated):
+        if c_char.isalpha():
+            shift = ord(k_char.lower()) - ord('a')
+            decrypted += caesar_cipher_decrypt(c_char, shift)
+        else:
+            decrypted += c_char
+    return decrypted
+
+def main():
+    print("Basic Encryption and Decryption Tool")
+    print("1. Caesar Cipher")
+    print("2. Vigenère Cipher")
+    
+    choice = input("Choose an option (1 or 2): ")
+    
+    if choice == '1':
+        action = input("Do you want to (e)ncrypt or (d)ecrypt? ")
+        text = input("Enter the text: ")
+        shift = int(input("Enter the shift value (1-25): "))
+        
+        if action.lower() == 'e':
+            result = caesar_cipher_encrypt(text, shift)
+            print("Encrypted text:", result)
+        elif action.lower() == 'd':
+            result = caesar_cipher_decrypt(text, shift)
+            print("Decrypted text:", result)
+        else:
+            print("Invalid action.")
+    
+    elif choice == '2':
+        action = input("Do you want to (e)ncrypt or (d)ecrypt? ")
+        text = input("Enter the text: ")
+        keyword = input("Enter the keyword: ")
+        
+        if action.lower() == 'e':
+            result = vigenere_encrypt(text, keyword)
+            print("Encrypted text:", result)
+        elif action.lower() == 'd':
+            result = vigenere_decrypt(text, keyword)
+            print("Decrypted text:", result)
+        else:
+            print("Invalid action.")
+    
+    else:
+        print("Invalid choice.")
+
+if __name__ == "__main__":
+    main()
