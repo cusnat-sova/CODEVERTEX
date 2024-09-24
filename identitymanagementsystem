@@ -1,0 +1,100 @@
+contracts/Identity.sol:
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract Identity {
+    struct User {
+        string name;
+        string email;
+        bool exists;
+    }
+
+    mapping(address => User) private users;
+
+    event UserRegistered(address indexed userAddress, string name, string email);
+    event UserUpdated(address indexed userAddress, string name, string email);
+
+    function register(string memory _name, string memory _email) public {
+        require(!users[msg.sender].exists, "User already registered.");
+        
+        users[msg.sender] = User(_name, _email, true);
+        emit UserRegistered(msg.sender, _name, _email);
+    }
+
+    function updateUser(string memory _name, string memory _email) public {
+        require(users[msg.sender].exists, "User not registered.");
+        
+        users[msg.sender].name = _name;
+        users[msg.sender].email = _email;
+        emit UserUpdated(msg.sender, _name, _email);
+    }
+
+    function getUser(address _userAddress) public view returns (string memory, string memory) {
+        require(users[_userAddress].exists, "User not found.");
+        return (users[_userAddress].name, users[_userAddress].email);
+    }
+}
+migrations/2_deploy_identity.js:
+const Identity = artifacts.require("Identity");
+
+module.exports = function(deployer) {
+    deployer.deploy(Identity);
+};
+index.html:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decentralized Identity Management</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.3.5/web3.min.js"></script>
+</head>
+<body>
+    <h1>Decentralized Identity Management</h1>
+    <input type="text" id="name" placeholder="Name">
+    <input type="email" id="email" placeholder="Email">
+    <button id="register">Register</button>
+    <button id="update">Update</button>
+    <button id="getUser">Get User</button>
+    <p id="result"></p>
+
+    <script>
+        let web3;
+        let contract;
+        let userAccount;
+
+        const identityContractAddress = 'YOUR_CONTRACT_ADDRESS_HERE'; // Update with your contract address
+        const identityABI = [ /* ABI from compiled contract */ ];
+
+        window.addEventListener('load', async () => {
+            if (window.ethereum) {
+                web3 = new Web3(window.ethereum);
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                userAccount = await web3.eth.getAccounts()[0];
+                contract = new web3.eth.Contract(identityABI, identityContractAddress);
+            } else {
+                alert('Please install MetaMask!');
+            }
+        });
+
+        document.getElementById('register').onclick = async () => {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            await contract.methods.register(name, email).send({ from: userAccount });
+            document.getElementById('result').innerText = 'User registered successfully!';
+        };
+
+        document.getElementById('update').onclick = async () => {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            await contract.methods.updateUser(name, email).send({ from: userAccount });
+            document.getElementById('result').innerText = 'User updated successfully!';
+        };
+
+        document.getElementById('getUser').onclick = async () => {
+            const user = await contract.methods.getUser(userAccount).call();
+            document.getElementById('result').innerText = `Name: ${user[0]}, Email: ${user[1]}`;
+        };
+    </script>
+</body>
+</html>
