@@ -1,0 +1,36 @@
+from cryptography.fernet import Fernet
+
+# Generate a key for encryption and decryption
+def generate_key():
+    return Fernet.generate_key()
+
+# Load a key from a file
+def load_key():
+    with open("secret.key", "rb") as key_file:
+        return key_file.read()
+
+# Encrypt a file
+def encrypt_file(file_path):
+    key = load_key()
+    fernet = Fernet(key)
+
+    with open(file_path, "rb") as file:
+        original = file.read()
+    
+    encrypted = fernet.encrypt(original)
+
+    with open(file_path, "wb") as encrypted_file:
+        encrypted_file.write(encrypted)
+
+# Decrypt a file
+def decrypt_file(file_path):
+    key = load_key()
+    fernet = Fernet(key)
+
+    with open(file_path, "rb") as encrypted_file:
+        encrypted = encrypted_file.read()
+    
+    decrypted = fernet.decrypt(encrypted)
+
+    with open(file_path, "wb") as decrypted_file:
+        decrypted_file.write(decrypted)
